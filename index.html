@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slot Machine Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f2f2f2;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        #slotMachine {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .image {
+            width: 80px;
+            height: 80px;
+            margin: 5px 0;
+            background-size: cover;
+        }
+        #generate, #newAttempt {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 20px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        #newAttempt {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Slot Machine Game</h1>
+<div id="playerName">Welcome, User</div>
+<div id="slotMachine">
+    <div class="column" id="column1"></div>
+    <div class="column" id="column2"></div>
+    <div class="column" id="column3"></div>
+</div>
+<button id="generate">Generate</button>
+<button id="newAttempt">New Attempt</button>
+<p id="message"></p>
+
+<script>
+    let images = ['img/apple.jpg', 'img/lemon.jpg', 'img/pear.jpg', 'img/peach.jpg', 'img/cherry.jpg'];
+    let playerName = prompt("Enter your name:");
+    document.getElementById("playerName").innerText = `Welcome, ${playerName}`;
+
+    let attempt = 1;
+    const maxAttempts = 3;
+
+    function generateRandomImages() {
+        let columns = [[], [], []];
+        
+        for (let i = 0; i < 3; i++) {
+            let usedImages = new Set();
+            for (let j = 0; j < 3; j++) {
+                let image;
+                do {
+                    image = images[Math.floor(Math.random() * images.length)];
+                } while (usedImages.has(image));
+                usedImages.add(image);
+                columns[i].push(image);
+            }
+        }
+
+        for (let i = 0; i < 3; i++) {
+            document.getElementById(`column${i + 1}`).innerHTML = '';
+            columns[i].forEach(img => {
+                const imgDiv = document.createElement("div");
+                imgDiv.classList.add("image");
+                imgDiv.style.backgroundImage = `url(${img})`;
+                document.getElementById(`column${i + 1}`).appendChild(imgDiv);
+            });
+        }
+
+        checkWin(columns);
+    }
+
+    function checkWin(columns) {
+        for (let i = 0; i < 3; i++) {
+            if (columns[0][i] === columns[1][i] && columns[1][i] === columns[2][i]) {
+                document.getElementById("message").innerText = `Congratulations ${playerName}, You Win!`;
+                endGame();
+                return;
+            }
+        }
+
+        attempt++;
+        if (attempt > maxAttempts) {
+            document.getElementById("message").innerText = `Sorry ${playerName}, You Lost.`;
+            endGame();
+        } else {
+            document.getElementById("message").innerText = `Attempt ${attempt} of ${maxAttempts}`;
+        }
+    }
+
+    function endGame() {
+        document.getElementById("generate").disabled = true;
+        document.getElementById("newAttempt").style.display = "inline-block";
+    }
+
+    function resetGame() {
+        attempt = 1;
+        document.getElementById("generate").disabled = false;
+        document.getElementById("newAttempt").style.display = "none";
+        document.getElementById("message").innerText = `Attempt ${attempt} of ${maxAttempts}`;
+        document.getElementById("slotMachine").querySelectorAll('.column').forEach(col => col.innerHTML = '');
+    }
+
+    document.getElementById("generate").addEventListener("click", generateRandomImages);
+    document.getElementById("newAttempt").addEventListener("click", resetGame);
+    document.getElementById("message").innerText = `Attempt ${attempt} of ${maxAttempts}`;
+</script>
+
+</body>
+</html>
